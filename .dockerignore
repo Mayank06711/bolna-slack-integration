@@ -1,0 +1,11 @@
+venv/
+.venv/
+.env
+.git/
+__pycache__/
+*.pyc
+*.log
+PLAN.md
+bolna.txt
+.idea/
+.vscode/
