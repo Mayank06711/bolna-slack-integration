@@ -15,7 +15,7 @@ from app.core.exceptions import (
 )
 from app.middleware.request_logging import RequestLoggingMiddleware
 from app.middleware.ip_whitelist import IPWhitelistMiddleware
-from app.api.router import api_router
+from app.api.router import api_router, dashboard_router
 from app.core.database import get_db_manager
 
 logger = get_logger(__name__)
@@ -70,6 +70,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(api_router)
+    app.include_router(dashboard_router)
 
     @app.get("/health")
     async def root_health():
