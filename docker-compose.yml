@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     container_name: bolna-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -19,6 +20,7 @@ services:
   app:
     build: .
     container_name: bolna-app
+    restart: unless-stopped
     env_file: .env
     environment:
       # Inside docker network, app talks to db service directly on 5432
