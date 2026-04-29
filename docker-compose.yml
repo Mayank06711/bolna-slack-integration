@@ -20,6 +20,9 @@ services:
     build: .
     container_name: bolna-app
     env_file: .env
+    environment:
+      # Override DATABASE_URL to use docker service name instead of localhost
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/bolna_alerts
     ports:
       - "8000:8000"
     depends_on:
