@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bolna_alerts
     ports:
-      - "5433:5432"
+      - "${DB_PORT:-5433}:5432"
     volumes:
       - bolna_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -21,10 +21,10 @@ services:
     container_name: bolna-app
     env_file: .env
     environment:
-      # Override DATABASE_URL to use docker service name instead of localhost
+      # Inside docker network, app talks to db service directly on 5432
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/bolna_alerts
     ports:
-      - "8000:8000"
+      - "${APP_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
