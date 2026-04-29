@@ -24,9 +24,9 @@ For long transcripts that exceed Slack's character limit, the message is automat
 - **Health**: https://bolna-alerts.mayank06711.xyz/health
 - **Webhook**: `POST https://bolna-alerts.mayank06711.xyz/api/v1/webhook`
 
-## Slack Alert Screenshots
+## Slack Alert Screenshot
 
-_Screenshots attached below_
+![Slack Alert](public/slack_alert.png)
 
 ## Setup
 
