@@ -7,11 +7,6 @@ logger = get_logger(__name__)
 
 
 class IPWhitelistMiddleware(BaseHTTPMiddleware):
-    """Restricts webhook endpoints to requests from allowed IPs.
-
-    Only applies to paths starting with /api/v1/webhook.
-    Other endpoints (health, docs) are unrestricted.
-    """
 
     def __init__(self, app, allowed_ips: list[str]):
         super().__init__(app)
@@ -20,7 +15,7 @@ class IPWhitelistMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
-        # Only filter webhook endpoints
+        # Only filter webhook endpoints — health, docs etc. stay open
         if request.url.path.startswith("/api/v1/webhook"):
             client_ip = request.client.host if request.client else "unknown"
 

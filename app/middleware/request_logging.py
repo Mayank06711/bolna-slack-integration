@@ -9,10 +9,6 @@ logger = get_logger(__name__)
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    """Logs every incoming request with method, path, status code, and duration.
-
-    Attaches a unique request_id to each request for correlation across logs.
-    """
 
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint

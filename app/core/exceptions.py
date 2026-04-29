@@ -6,8 +6,6 @@ logger = get_logger(__name__)
 
 
 class WebhookProcessingError(Exception):
-    """Raised when webhook payload processing fails."""
-
     def __init__(self, message: str, status_code: int = 500):
         self.message = message
         self.status_code = status_code
@@ -15,8 +13,6 @@ class WebhookProcessingError(Exception):
 
 
 class SlackNotificationError(Exception):
-    """Raised when sending a Slack notification fails."""
-
     def __init__(self, message: str, status_code: int = 502):
         self.message = message
         self.status_code = status_code
@@ -24,8 +20,6 @@ class SlackNotificationError(Exception):
 
 
 class DatabaseError(Exception):
-    """Raised when a database operation fails."""
-
     def __init__(self, message: str, status_code: int = 500):
         self.message = message
         self.status_code = status_code

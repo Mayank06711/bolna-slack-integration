@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import text
 from app.config import get_settings
 from app.core.logging import get_logger
 
@@ -11,16 +12,10 @@ logger = get_logger(__name__)
 
 
 class Base(DeclarativeBase):
-    """Base class for all ORM models."""
     pass
 
 
 class DatabaseManager:
-    """Manages the async database engine and session factory.
-
-    Single Responsibility: only handles connection lifecycle.
-    Created once at startup, provides sessions per-request.
-    """
 
     def __init__(self, database_url: str):
         self._engine = create_async_engine(
@@ -45,16 +40,12 @@ class DatabaseManager:
         return self._engine
 
     async def get_session(self) -> AsyncSession:
-        """Creates a new async session. Caller is responsible for closing."""
         return self._session_factory()
 
     async def check_connection(self) -> bool:
-        """Verifies database connectivity."""
         try:
             async with self._engine.connect() as conn:
-                await conn.execute(
-                    __import__("sqlalchemy").text("SELECT 1")
-                )
+                await conn.execute(text("SELECT 1"))
             return True
         except Exception as exc:
             logger.error(
@@ -64,17 +55,14 @@ class DatabaseManager:
             return False
 
     async def close(self) -> None:
-        """Disposes the engine and all pooled connections."""
         await self._engine.dispose()
         logger.info("Database engine disposed")
 
 
-# Module-level instance — initialized lazily
 _db_manager: DatabaseManager | None = None
 
 
 def get_db_manager() -> DatabaseManager:
-    """Returns the singleton DatabaseManager instance."""
     global _db_manager
     if _db_manager is None:
         settings = get_settings()

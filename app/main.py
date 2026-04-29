@@ -16,13 +16,13 @@ from app.core.exceptions import (
 from app.middleware.request_logging import RequestLoggingMiddleware
 from app.middleware.ip_whitelist import IPWhitelistMiddleware
 from app.api.router import api_router
+from app.core.database import get_db_manager
 
 logger = get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manages application lifecycle — startup and shutdown resources."""
     settings = get_settings()
     setup_logging(settings.log_level)
 
@@ -31,34 +31,36 @@ async def lifespan(app: FastAPI):
         extra={"extra_data": {"env": settings.app_env, "port": settings.app_port}},
     )
 
-    # Shared httpx client for outbound requests (Slack)
     app.state.http_client = httpx.AsyncClient(timeout=10.0)
+
+    db_manager = get_db_manager()
+    db_connected = await db_manager.check_connection()
+    logger.info(
+        f"Database connection: {'established' if db_connected else 'FAILED'}",
+        extra={"extra_data": {"db_connected": db_connected}},
+    )
 
     yield
 
-    # Cleanup
     await app.state.http_client.aclose()
+    await db_manager.close()
     logger.info("Application shutdown complete")
 
 
 def create_app() -> FastAPI:
-    """Application factory — builds and configures the FastAPI instance."""
     settings = get_settings()
 
     app = FastAPI(
         title="Bolna Slack Integration",
-        description="Webhook server that sends Slack alerts when Bolna calls complete",
         version="1.0.0",
         lifespan=lifespan,
     )
 
-    # Exception handlers
     app.add_exception_handler(WebhookProcessingError, webhook_processing_error_handler)
     app.add_exception_handler(SlackNotificationError, slack_notification_error_handler)
     app.add_exception_handler(DatabaseError, database_error_handler)
     app.add_exception_handler(Exception, generic_exception_handler)
 
-    # Middleware (order matters — last added runs first)
     app.add_middleware(RequestLoggingMiddleware)
 
     if settings.enable_ip_whitelist:
@@ -67,7 +69,6 @@ def create_app() -> FastAPI:
             allowed_ips=[settings.bolna_webhook_ip, "127.0.0.1"],
         )
 
-    # Routes
     app.include_router(api_router)
 
     @app.get("/health")

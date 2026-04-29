@@ -7,11 +7,6 @@ from app.core.database import Base
 
 
 class CallLog(Base):
-    """ORM model for the call_logs table.
-
-    Stores every processed Bolna webhook payload as an audit trail.
-    """
-
     __tablename__ = "call_logs"
 
     id: Mapped[uuid.UUID] = mapped_column(
