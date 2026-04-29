@@ -62,6 +62,7 @@ class BolnaWebhookPayload(BaseModel):
     status: str = Field(...)
     transcript: str | None = Field(default=None)
     conversation_time: float | None = Field(default=None)
+    conversation_duration: float | None = Field(default=None)
     total_cost: float | None = Field(default=None)
     error_message: str | None = Field(default=None)
     answered_by_voice_mail: bool | None = Field(default=None)

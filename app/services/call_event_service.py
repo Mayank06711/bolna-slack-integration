@@ -86,12 +86,16 @@ class CallEventService:
         )
 
     def _resolve_duration(self, payload: BolnaWebhookPayload) -> float:
-        # Prefer telephony_data.duration (string of seconds from provider)
-        # Fall back to conversation_time (float from Bolna)
+        # 1. telephony_data.duration — phone calls (string of seconds from provider)
+        # 2. conversation_duration — web/browser calls
+        # 3. conversation_time — fallback
         if payload.telephony_data and payload.telephony_data.duration:
             try:
                 return float(payload.telephony_data.duration)
             except (ValueError, TypeError):
                 pass
+
+        if payload.conversation_duration:
+            return payload.conversation_duration
 
         return payload.conversation_time or 0.0
